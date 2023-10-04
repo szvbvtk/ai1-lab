@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>Endangered species</title>
 
-    <link rel="stylesheet" href="style1.css">
+    <link rel="stylesheet" href="style1.css" />
   </head>
   <body>
     <header>
@@ -12,25 +12,25 @@
       <h2>Here are some of the most endangered animal species</h2>
       <nav>
         <ul>
-          <li>Strona główna</li>
+          <li><a href="#">Home</a></li>
           <li>
-            Home
-            <ul>
-              <li>Asian elephant</li>
-              <li>Black rhino</li>
-              <li>Blue whale</li>
-              <li>Chimpanzee</li>
-              <li>Hawksbill sea turtle</li>
-              <li>Red panda</li>
+            <a href="#">Species</a>
+            <ul class="species_list">
+              <li><a href="#asian-elephant">Asian elephant</a></li>
+              <li><a href="#black-rhino">Black rhino</a></li>
+              <li><a href="#blue-whale">Blue whale</a></li>
+              <li><a href="#chimpanzee">Chimpanzee</a></li>
+              <li><a href="#hawksbill-sea-turtle">Hawksbill sea turtle</a></li>
+              <li><a href="#red-panda">Red panda</a></li>
             </ul>
           </li>
-          <li>About us</li>
-          <li>Contact</li>
+          <li><a href="#">About us</a></li>
+          <li><a href="#">Contact</a></li>
         </ul>
       </nav>
     </header>
     <main>
-      <article>
+      <article id="asian-elephant">
         <h3>Asian elephant</h3>
         <img src="img/asian-elephant.jpg" alt="Asian elephant" />
         <p>
@@ -39,7 +39,7 @@
           caramels.
         </p>
       </article>
-      <article>
+      <article id="black-rhino">
         <h3>Black rhino</h3>
         <img src="img/black-rhino.jpg" alt="Black rhino" />
         <p>
@@ -49,7 +49,7 @@
           beans. Toffee jelly-o dessert cupcake jelly beans.
         </p>
       </article>
-      <article>
+      <article id="blue-whalev">
         <h3>Blue whale</h3>
         <img src="img/blue-whale.jpg" alt="Blue whale" />
         <p>
@@ -59,8 +59,8 @@
           croissant sugar plum cotton candy icing.
         </p>
       </article>
-      <article>
-        <h3>Blue whale</h3>
+      <article id="chimpanzee">
+        <h3>Chimpanzee</h3>
         <img src="img/chimpanzee.jpg" alt="Chimpanzee" />
         <p>
           Powder cotton candy macaroon cake brownie jujubes bonbon wafer
@@ -69,8 +69,8 @@
           jelly.
         </p>
       </article>
-      <article>
-        <h3>Blue whale</h3>
+      <article id="hawksbill-sea-turtle">
+        <h3>Hawksbill sea turtle</h3>
         <img src="img/hawksbill-sea-turtle.jpg" alt="Hawksbill sea turtle" />
         <p>
           Cake jelly beans bear claw cupcake pudding. Cupcake gingerbread bonbon
@@ -78,8 +78,8 @@
           claw toffee dragée.
         </p>
       </article>
-      <article>
-        <h3>Blue whale</h3>
+      <article id="red-panda">
+        <h3>Red panda</h3>
         <img src="img/red-panda.jpg" alt="Red panda" />
         <p>
           Jelly-o bonbon topping sugar plum candy tart candy canes. Donut cake
@@ -88,8 +88,8 @@
         </p>
       </article>
     </main>
-    <footer>&copy; <span>Krystian Szabat</span></footer>
+    <footer>
+      <p>&copy;Krystian Szabat</p>
+    </footer>
   </body>
 </html>
-
-<!--https://www.worldwildlife.org/species/directory?direction=desc&page=2&sort=extinction_status-->

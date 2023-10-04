@@ -1,0 +1,113 @@
+*{
+    margin: 0;
+}
+
+nav ul {
+  display: flex;
+  list-style-type: none;
+  justify-content: space-between;
+  color: #fff;
+  padding: 0;
+  background-color: #333;
+  color: #fff;
+}
+
+nav ul a {
+  text-decoration: none;
+  padding: 22px;
+  display: block;
+  color: #fff;
+}
+
+nav ul li {
+  position: relative;
+}
+
+.species_list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0%;
+  background-color: #444;
+}
+
+nav ul li:hover .species_list {
+  display: block;
+}
+
+.species_list li {
+  display: inline-block;
+}
+
+nav > ul > li:nth-child(2) {
+  background-color: red;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+header {
+  background-color: #5c5c5c;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  font-weight: bolder;
+}
+
+h1 {
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  font-size: 35px;
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 24px;
+  text-transform: uppercase;
+  letter-spacing: 9px;
+  margin-bottom: 7px;
+}
+
+main {
+  background-color: black;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+article {
+  border: 2px solid rgb(10, 68, 10);
+  margin: 8px;
+  padding: 0px 5px 5px 8px;
+  border-radius: 8%;
+}
+
+article h3 {
+  color: #fff;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+article p {
+  color: rgb(209, 209, 203);
+  font-size: 19px;
+}
+
+article img {
+  max-width: 100%;
+  height: auto;
+}
+
+footer{
+    text-align: right;
+    background-color: #333;
+}
+
+footer p{
+    margin: 0;
+    padding: 10px 10px;
+    font-size: 20px;
+}
+
+
