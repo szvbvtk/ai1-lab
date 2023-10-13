@@ -1,0 +1,63 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: grid;
+  grid-template-columns: 1fr 9fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "header header"
+    "nav main";
+  min-height: 100%;
+}
+
+header {
+  grid-area: header;
+  padding: 20px;
+}
+
+nav {
+  grid-area: nav;
+}
+
+main {
+  grid-area: main;
+  padding: 0 30px 0 30px;
+}
+
+.species_list {
+  display: none; /* Ukryj listę */
+  position: absolute;
+  background-color: #444;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Stylizacja linków w liście */
+.species_list li {
+  padding: 10px;
+}
+
+/* Po najechaniu na "Species", pokaż listę */
+nav li:hover .species_list {
+  display: block;
+}
+
+
+article {
+    text-align: center;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+    padding: 10px;
+    display: inline-block;
+    position: relative;
+  }
+
+  img {
+    max-width: 50%;
+    height: auto;
+  }
+  
