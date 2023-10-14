@@ -49,27 +49,7 @@ nav ul li:hover .species_list li {
   z-index: 20;
 }
 
-@media only screen and (max-device-width: 800px) {
-  nav ul li {
-    position: relative;
-    flex: 100%;
-    color: blue;
-  }
 
-  nav ul li:hover .species_list {
-    display: flex;
-    flex-wrap: wrap;
-    z-index: 20;
-    width: 100%;
-  }
-  .species_list li {
-    flex: 100%;
-  }
-
-  li {
-    font-size: 40px;
-  }
-}
 
 nav > ul > li:nth-child(2) {
   background-color: red;
@@ -153,4 +133,35 @@ footer p {
   margin: 0;
   padding: 10px 10px;
   font-size: 20px;
+}
+
+
+@media only screen and (max-device-width: 800px) {
+  nav ul li {
+    position: relative;
+    flex: 100%;
+    color: blue;
+  }
+
+  nav ul li:hover .species_list {
+    display: flex;
+    flex-wrap: wrap;
+    z-index: 20;
+    width: 100%;
+  }
+  .species_list li {
+    flex: 100%;
+  }
+
+  li {
+    font-size: 40px;
+  }
+
+  main {
+    grid-template-columns: 1fr; /* Jeden kolumna na ekranach o szerokości <= 800px */
+  }
+
+  article {
+    padding: 20px; /* Dostosuj wewnętrzne marginesy */
+  }
 }
