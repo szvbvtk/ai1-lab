@@ -49,7 +49,9 @@ nav ul li:hover .species_list li {
   z-index: 20;
 }
 
-
+body{
+  background-image: url('./img/bg.jpg');
+}
 
 nav > ul > li:nth-child(2) {
   background-color: red;
@@ -86,7 +88,7 @@ h2 {
 }
 
 main {
-  background-color: #155263;
+
   display: grid;
   /* grid-template-columns: repeat(2, 1fr); */
   grid-template-columns: repeat(auto-fit, minmax(800px, 1fr));
@@ -99,6 +101,7 @@ article {
   padding: 0px 5px 5px 8px;
   /* border-radius: 8%; */
   padding: 40px;
+  background-color: #155263;
 }
 
 li {
@@ -154,7 +157,7 @@ footer p {
   }
 
   li {
-    font-size: 40px;
+    font-size: 20px;
   }
 
   main {
@@ -163,5 +166,10 @@ footer p {
 
   article {
     padding: 20px; /* Dostosuj wewnętrzne marginesy */
+  }
+
+  body{
+    background-image: none;
+    background-color: #155263;;
   }
 }
