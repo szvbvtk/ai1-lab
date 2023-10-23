@@ -69,8 +69,13 @@ class Todo {
       const dateInput = document.createElement("input");
       dateInput.type = "text";
       dateInput.value = task.date;
-      // dateInput.setAttribute("onclick", `editDate(this)`);
+      dateInput.addEventListener("focus", () => { editDate(dateInput); });
       dateSpan.appendChild(dateInput);
+
+      // const calendarIcon = document.createElement("span");
+      // calendarIcon.className = "material-symbols-outlined";
+      // calendarIcon.textContent = "edit_calendar";
+      // dateSpan.appendChild(calendarIcon);
 
       const deleteButton = document.createElement("span");
       deleteButton.className = "material-symbols-outlined delete_btn";
