@@ -1,15 +1,15 @@
-function editDate(input) {
-  let date = new Date(input.value);
-  let day = date.getDate();
-  let month = date.getMonth() + 1;
-  let year = date.getFullYear();
+// function editDate(input) {
+//   let date = new Date(input.value);
+//   let day = date.getDate();
+//   let month = date.getMonth() + 1;
+//   let year = date.getFullYear();
 
-  month = month < 10 ? "0" + month : month;
-  day = day < 10 ? "0" + day : day;
+//   month = month < 10 ? "0" + month : month;
+//   day = day < 10 ? "0" + day : day;
 
-  input.type = "date";
-  input.value = year + "-" + month + "-" + day;
-}
+//   input.type = "date";
+//   input.value = year + "-" + month + "-" + day;
+// }
 
 class Todo {
   constructor() {
@@ -31,11 +31,13 @@ class Todo {
     this.tasks[taskIndex].name = taskName;
     this.tasks[taskIndex].date = taskDate;
     this.tasks[taskIndex].completed = this.tasks[taskIndex].completed;
+    console.log(taskName);
     this.draw();
   }
 
   toggleCompleted(taskIndex) {
     this.tasks[taskIndex].completed = !this.tasks[taskIndex].completed;
+    console.log('ddkdk');
     this.draw();
   }
 
@@ -48,6 +50,7 @@ class Todo {
     this.tasks.forEach((task, index) => {
       const li = document.createElement("li");
 
+
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.name = "todo-item";
@@ -58,6 +61,8 @@ class Todo {
       });
 
       const label = document.createElement("label");
+      label.contentEditable = "true";
+      label.id = "nameLabel" + index;
       label.htmlFor = "todo-item-" + index;
       label.textContent = task.name;
       if (task.completed) {
@@ -68,14 +73,9 @@ class Todo {
       dateSpan.className = "date";
       const dateInput = document.createElement("input");
       dateInput.type = "text";
+      dateInput.id = "dateInput" + index;
       dateInput.value = task.date;
-      dateInput.addEventListener("focus", () => { editDate(dateInput); });
       dateSpan.appendChild(dateInput);
-
-      // const calendarIcon = document.createElement("span");
-      // calendarIcon.className = "material-symbols-outlined";
-      // calendarIcon.textContent = "edit_calendar";
-      // dateSpan.appendChild(calendarIcon);
 
       const deleteButton = document.createElement("span");
       deleteButton.className = "material-symbols-outlined delete_btn";
@@ -90,6 +90,23 @@ class Todo {
       li.appendChild(deleteButton);
 
       ul.appendChild(li);
+
+      // tylko zeby sprawdzic czy dziala
+      label.addEventListener("focusout", (li) => {
+        let newDate = document.getElementById("dateInput" + index).value;
+        let newTaskName = document.getElementById("nameLabel" + index).innerText;
+
+        this.editTask(index, newTaskName, newDate);
+      })
+
+      dateInput.addEventListener("focusout", (li) => {
+        let newDate = document.getElementById("dateInput" + index).value;
+        let newTaskName = document.getElementById("nameLabel" + index).innerText;
+
+        this.editTask(index, newTaskName, newDate);
+      })
+
+
 
       todoDiv.appendChild(ul);
     });
