@@ -1,0 +1,306 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Oswald:wght@400;700&family=Raleway:wght@500;700&display=swap");
+
+body {
+  display: grid;
+  grid-template-columns: 2fr 8fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header header"
+    "nav main"
+    "footer footer";
+  min-height: 100%;
+  background: #949494;
+  background-image: linear-gradient(to left, #97cdd4, #283739);
+  background-image: url('./img/bg2.jpg');
+
+}
+
+header {
+  grid-area: header;
+  padding: 20px;
+}
+
+nav {
+  grid-area: nav;
+  background: #283739e1;
+}
+
+main {
+  grid-area: main;
+  padding: 0 30px 0 30px;
+
+}
+
+.species_list {
+  display: none; /* Ukryj listę */
+  position: absolute;
+  background-color: #444;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Stylizacja linków w liście */
+.species_list li {
+  padding: 10px;
+}
+
+/* Po najechaniu na "Species", pokaż listę */
+nav li:hover .species_list {
+  display: block;
+}
+
+h1 {
+  font-family: "Oswald", sans-serif;
+  font-size: 35px;
+  text-decoration: underline;
+  text-align: center;
+  margin-bottom: 9px;
+  font-weight: 700;
+  text-shadow: 8px 10px 8px rgba(28, 29, 26, 0.7);
+  color: aliceblue;
+}
+
+h2 {
+  font-family: "Oswald", sans-serif;
+  font-weight: 500;
+  text-align: center;
+  font-size: 29px;
+  color: aliceblue;
+}
+
+p {
+  font-family: "Open Sans", sans-serif;
+  color: #e0e0e0;
+  font-size: 23px;
+  text-align: justify;
+}
+
+article {
+  /* text-align: center; */
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  padding: 10px;
+  display: inline-block;
+  position: relative;
+  background: #2c5d63;
+  border: 2px dashed #e0e0e0;
+}
+
+img {
+  max-width: 50%;
+  height: auto;
+  float: left;
+  margin: 15px;
+  border: 2px solid #a2c11c;
+  border-radius: 20px;
+}
+
+/* Nowe style dla elementów listy w nawigacji */
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+h3 {
+  text-align: center;
+  font-family: "Raleway", sans-serif;
+  font-weight: 700;
+  font-size: 27px;
+}
+
+p {
+  padding: 15px;
+}
+
+nav li {
+  margin: 9px;
+  font-size: 18px;
+}
+
+nav a {
+  text-decoration: none;
+  font-family: "Raleway", sans-serif;
+  font-weight: 500;
+  color: #a2c11c;
+  padding: 10px; /* Dodaj odstępy wewnętrzne dla linków */
+}
+
+/* Po najechaniu na link, zmień tło */
+nav a:hover {
+  background-color: #555;
+}
+
+/* Stylizacja dla podpozycji (submenu) */
+.species_list {
+  display: none;
+  background-color: #444;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+}
+
+.species_list li {
+  padding: 10px;
+}
+
+.species_list a {
+  text-decoration: none;
+  color: #a2c11c;
+}
+
+/* Po najechaniu na "Species", pokaż listę */
+nav li:hover .species_list {
+  display: block;
+}
+
+::-webkit-scrollbar {
+  width: 10px; /* Dostosuj szerokość paska */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #a2c11c; /* Kolor "kciuka" przewijania */
+  border-radius: 5px; /* Zaokrąglenie "kciuka" */
+}
+
+/* Poziomy pasek przewijania */
+::-webkit-scrollbar-track {
+  background: #e0e0e0; /* Kolor tła paska przewijania */
+}
+
+header {
+  background: #283739;
+  border-bottom: 3px solid #e0e0e0;
+  margin-bottom: 10px;
+}
+
+footer {
+  margin-top: 10px;
+  background: #283739;
+  grid-area: footer;
+  border-top: 3px solid #e0e0e0;
+}
+
+footer p {
+  text-align: right;
+}
+
+@media only screen and (max-device-width: 800px) {
+  body {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "header"
+      "nav"
+      "main"
+      "footer";
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    float: none;
+    margin: 0;
+    border: none;
+    outline: 1px solid white;
+    outline-offset: -6px;
+  }
+
+  h3 {
+    font-size: 30px;
+    margin-bottom: 10px;
+    letter-spacing: 5px;
+    color: #a2c11c;
+  }
+
+  main {
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
+  article {
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
+
+  footer {
+    /* display: none; */
+    margin: 0;
+  }
+
+  header {
+    border: none;
+    margin: 0;
+  }
+
+  nav {
+    /* display: none; */
+    background-color: #a2c11c;
+    border: none;
+    text-align: center;
+  }
+
+  nav li {
+    display: block; /* Wyświetlaj elementy jeden pod drugim */
+    margin-right: 0 auto; /* Usuń margines między elementami nawigacji */
+    border-bottom: 2px dashed white;
+  }
+
+  nav a {
+   
+    color: white;
+    font-size:23px;
+  }
+  nav ul {
+    list-style: none;
+    position:relative;
+    top: 0;
+    transform:none;
+  }
+
+
+  /* Stylizacja dla podpozycji (submenu) */
+.species_list {
+  display: none;
+  background-color: #444;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 30;
+  width: 90vw;
+  margin: 0 auto;
+
+}
+
+.species_list li {
+  padding: 10px; 
+  
+}
+
+.species_list a {
+  text-decoration: none;
+  color: #a2c11c;
+  margin: 0;
+}
+
+/* Po najechaniu na "Species", pokaż listę */
+nav li:hover .species_list {
+  display: block;
+}
+}

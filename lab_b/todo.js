@@ -1,55 +1,100 @@
-// function editDate(input) {
-//   let date = new Date(input.value);
-//   let day = date.getDate();
-//   let month = date.getMonth() + 1;
-//   let year = date.getFullYear();
-
-//   month = month < 10 ? "0" + month : month;
-//   day = day < 10 ? "0" + day : day;
-
-//   input.type = "date";
-//   input.value = year + "-" + month + "-" + day;
-// }
-
 class Todo {
   constructor() {
-    this.tasks = Array();
+    this.clearInputs(true);
+
+    const saveButton = document.getElementById("saveButton");
+    saveButton.addEventListener("click", () => {
+      this.saveButtonHandler();
+    });
+
+    const searchBox = document.getElementById("search-box");
+    let searchTimeout;
+    searchBox.addEventListener("input", () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const searchValue = searchBox.value;
+        this.searchTasks(searchValue);
+      }, 300);
+    });
+
+    this.tasks = JSON.parse(localStorage.getItem("tasks")) || Array();
+    this.filteredTasks = this.tasks;
+    this.draw();
+  }
+
+  clearInputs(clearSearchBox = false) {
+    document.getElementById("newTask-name").value = "";
+    document.getElementById("newTask-date").value = "";
+
+    if (clearSearchBox) {
+      document.querySelector(".search-box input[type='text']").value = "";
+    }
+  }
+
+  searchTasks(searchValue) {
+    this.filteredTasks = this.tasks.filter((task) => {
+      return task.name.toLowerCase().includes(searchValue.toLowerCase());
+    });
+    this.draw(this.filteredTasks);
+  }
+
+  saveToLocalStorage() {
+    localStorage.setItem("tasks", JSON.stringify(this.tasks));
   }
 
   addTask(task) {
+    if (!task.date) {
+      const currDate = new Date();
+      const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+      task.date = currDate.toLocaleDateString("en-CA", options);
+    }
+
+    task.id = Date.now().toString();
     task.completed = false;
     this.tasks.push(task);
+    this.saveToLocalStorage();
+    this.clearInputs();
     this.draw();
   }
 
   removeTask(taskIndex) {
-    this.tasks.splice(taskIndex, 1);
-    this.draw();
+    const id = this.tasks.findIndex((task) => task.id === taskIndex);
+    if (id !== -1) {
+      this.tasks.splice(id, 1);
+      this.saveToLocalStorage();
+      this.draw();
+    }
+
+    this.clearInputs(true);
   }
 
   editTask(taskIndex, taskName, taskDate) {
     this.tasks[taskIndex].name = taskName;
     this.tasks[taskIndex].date = taskDate;
     this.tasks[taskIndex].completed = this.tasks[taskIndex].completed;
-    console.log(taskName);
+    this.saveToLocalStorage();
     this.draw();
   }
 
   toggleCompleted(taskIndex) {
-    this.tasks[taskIndex].completed = !this.tasks[taskIndex].completed;
-    console.log('ddkdk');
-    this.draw();
+    const task = this.tasks.find((task) => task.id === taskIndex);
+
+    if (task) {
+      task.completed = !task.completed;
+      this.saveToLocalStorage();
+      this.draw(this.filteredTasks);
+    }
   }
 
-  draw() {
+  draw(tasks = this.tasks) {
     const todoDiv = document.getElementById("todo");
     todoDiv.innerHTML = "";
 
     const ul = document.createElement("ul");
 
-    this.tasks.forEach((task, index) => {
+    for (const task of tasks) {
       const li = document.createElement("li");
-
+      const index = task.id;
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
@@ -60,19 +105,31 @@ class Todo {
         this.toggleCompleted(index);
       });
 
-      const label = document.createElement("label");
-      label.contentEditable = "true";
-      label.id = "nameLabel" + index;
-      label.htmlFor = "todo-item-" + index;
-      label.textContent = task.name;
+      const taskName = document.createElement("span");
+      taskName.contentEditable = "true";
+      taskName.id = "nametaskName" + index;
+      taskName.textContent = task.name;
       if (task.completed) {
-        label.className = "completed";
+        taskName.className = "completed";
+      }
+
+      const searchValue = document.querySelector(
+        ".search-box input[type='text']"
+      ).value;
+      if (searchValue) {
+        const regex = new RegExp(searchValue, "ig");
+        taskName.innerHTML = taskName.textContent.replace(
+          regex,
+          (match) => `<mark>${match}</mark>`
+        );
+      } else {
+        taskName.innerText = taskName.textContent;
       }
 
       const dateSpan = document.createElement("span");
       dateSpan.className = "date";
       const dateInput = document.createElement("input");
-      dateInput.type = "text";
+      dateInput.type = "date";
       dateInput.id = "dateInput" + index;
       dateInput.value = task.date;
       dateSpan.appendChild(dateInput);
@@ -85,36 +142,43 @@ class Todo {
       });
 
       li.appendChild(checkbox);
-      li.appendChild(label);
+      li.appendChild(taskName);
       li.appendChild(dateSpan);
       li.appendChild(deleteButton);
 
       ul.appendChild(li);
 
-      // tylko zeby sprawdzic czy dziala
-      label.addEventListener("focusout", (li) => {
+      taskName.addEventListener("focusout", (li) => {
         let newDate = document.getElementById("dateInput" + index).value;
-        let newTaskName = document.getElementById("nameLabel" + index).innerText;
+        let newTaskName = document.getElementById(
+          "nametaskName" + index
+        ).innerText;
 
         this.editTask(index, newTaskName, newDate);
-      })
+      });
 
       dateInput.addEventListener("focusout", (li) => {
         let newDate = document.getElementById("dateInput" + index).value;
-        let newTaskName = document.getElementById("nameLabel" + index).innerText;
+        let newTaskName = document.getElementById(
+          "nametaskName" + index
+        ).innerText;
 
         this.editTask(index, newTaskName, newDate);
-      })
-
-
+      });
 
       todoDiv.appendChild(ul);
-    });
+    }
   }
 
   saveButtonHandler() {
     const taskName = document.getElementById("newTask-name").value;
-    const taskDate = document.getElementById("newTask-date").value;
+
+    if (taskName.trim() === "") {
+      this.clearInputs();
+      return alert("Please enter a task name");
+    }
+
+    let taskDate = document.getElementById("newTask-date").value;
 
     let task = { name: taskName, date: taskDate };
     this.addTask(task);
@@ -122,10 +186,3 @@ class Todo {
 }
 
 const todo = new Todo();
-todo.addTask({ name: "Task 1", date: "2021-01-01" });
-todo.addTask({ name: "Task 2", date: "2021-01-02" });
-
-const saveButton = document.getElementById("saveButton");
-saveButton.addEventListener("click", () => {
-  todo.saveButtonHandler();
-});
