@@ -1,3 +1,4 @@
+document.getElementById('newTask-date').setAttribute('min', new Date().toLocaleDateString("en-CA"));
 class Todo {
   constructor() {
     this.clearInputs(true);
@@ -32,10 +33,14 @@ class Todo {
   }
 
   searchTasks(searchValue) {
-    this.filteredTasks = this.tasks.filter((task) => {
-      return task.name.toLowerCase().includes(searchValue.toLowerCase());
-    });
-    this.draw(this.filteredTasks);
+    if (searchValue.length >= 2) {
+      this.filteredTasks = this.tasks.filter((task) => {
+        return task.name.toLowerCase().includes(searchValue.toLowerCase());
+      });
+      this.draw(this.filteredTasks);
+    } else {
+      this.draw();
+    }
   }
 
   saveToLocalStorage() {
@@ -43,10 +48,20 @@ class Todo {
   }
 
   addTask(task) {
+    if (task.name.length < 3 || task.name.length > 255) {
+      console.log("Task name must be between 3 and 255 characters long");
+      return;
+    }
+
     if (!task.date) {
       const currDate = new Date();
       const options = { year: "numeric", month: "2-digit", day: "2-digit" };
       task.date = currDate.toLocaleDateString("en-CA", options);
+    }
+
+    if (task.date < new Date().toLocaleDateString("en-CA")) {
+      console.log("Task date must be in the future");
+      return;
     }
 
     task.id = Date.now().toString();
@@ -69,9 +84,22 @@ class Todo {
   }
 
   editTask(taskIndex, taskName, taskDate) {
-    this.tasks[taskIndex].name = taskName;
-    this.tasks[taskIndex].date = taskDate;
-    this.tasks[taskIndex].completed = this.tasks[taskIndex].completed;
+    const id = this.tasks.findIndex((task) => task.id === taskIndex);
+
+    if (
+      taskName.length < 3 ||
+      taskName.length > 255 ||
+      taskDate < new Date().toLocaleDateString("en-CA")
+    ) {
+      console.log(
+        "Task name must be between 3 and 255 characters long and date must be in the future"
+      );
+      return;
+    }
+
+    this.tasks[id].name = taskName;
+    this.tasks[id].date = taskDate;
+    this.tasks[id].completed = this.tasks[id].completed;
     this.saveToLocalStorage();
     this.draw();
   }
@@ -116,7 +144,7 @@ class Todo {
       const searchValue = document.querySelector(
         ".search-box input[type='text']"
       ).value;
-      if (searchValue) {
+      if (searchValue.length >= 2) {
         const regex = new RegExp(searchValue, "ig");
         taskName.innerHTML = taskName.textContent.replace(
           regex,
@@ -131,6 +159,7 @@ class Todo {
       const dateInput = document.createElement("input");
       dateInput.type = "date";
       dateInput.id = "dateInput" + index;
+      dateInput.min = new Date().toLocaleDateString("en-CA");
       dateInput.value = task.date;
       dateSpan.appendChild(dateInput);
 
