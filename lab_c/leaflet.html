@@ -35,7 +35,6 @@
         float: left;
         border: 1px solid black;
         cursor: grab;
-        user-drag: none;
       }
       
       .canvas-cell {
@@ -135,7 +134,6 @@
         );
       });
 
-      // Add drag and drop support for puzzle pieces
       const puzzlePieces = document.querySelectorAll(".puzzle-piece");
       puzzlePieces.forEach((piece) => {
         piece.addEventListener("dragstart", function (event) {
