@@ -29,20 +29,46 @@
         position: relative;
       }
 
-      .puzzle-piece {
-        width: 150px;
-        height: 75px;
-        float: left;
-        border: 1px solid black;
-        cursor: grab;
-      }
-
       .canvas-cell {
         width: 150px;
         height: 75px;
         position: absolute;
         border: 1px solid black;
         overflow: hidden;
+      }
+      .puzzle-canvas {
+        width: 150px;
+        height: 75px;
+        /* border: 1px solid black; */
+        padding: 1px;
+        cursor: grab;
+      }
+
+      .puzzle-canvas:hover {
+        border: 2px dashed red; /* Możesz dostosować styl obramowania według własnych preferencji */
+      }
+
+      .puzzle-canvas.complete {
+        opacity: 0.7; /* Ustawiamy poziom przezroczystości dla ułożonych puzzli */
+        pointer-events: none; /* Wyłączamy obsługę zdarzeń dla ułożonych puzzli */
+      }
+      .canvas-cell.complete {
+        border: none;
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0px; /* Dostosuj tę wartość, aby ustawić odstęp od góry */
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        left: 0px; /* Dostosuj tę wartość, aby ustawić odstęp od lewej strony */
+        background-color: rgba(
+          114,
+          112,
+          112,
+          0.185
+        ); /* Kolor tła z przezroczystością */
       }
     </style>
   </head>
@@ -58,73 +84,91 @@
     <div id="puzzle"></div>
 
     <script>
-      let map = L.map("map").setView([53.430127, 14.564802], 18);
+      let map = L.map("map").setView([50, 12], 18);
       L.tileLayer.provider("Esri.WorldImagery").addTo(map);
-      // let marker = L.marker([53.430127, 14.564802]).addTo(map);
-      // marker.bindPopup("<strong>Hello!</strong><br>This is a popup.");
 
-      document
-        .getElementById("saveButton")
-        .addEventListener("click", () =>{
-          leafletImage(map, (err, canvas) => {
-            // Clear the existing puzzle pieces
-            document.getElementById("puzzle").innerText = "";
-            document.getElementById("rasterMap").innerText = "";
+      document.getElementById("saveButton").addEventListener("click", () => {
+        leafletImage(map, (err, canvas) => {
+          const puzzleContainer = document.getElementById("puzzle");
+          const rasterMap = document.getElementById("rasterMap");
+          rasterMap.innerText = "";
+          puzzleContainer.innerText = "";
 
-            canvasData = canvas.toDataURL();
+          canvasData = canvas.toDataURL();
+          let puzzlePieces = [];
+          for (let i = 0; i < 16; i++) {
+            const x = (i % 4) * 150;
+            const y = Math.floor(i / 4) * 75;
 
-            // Split the map into 16 pieces and display them as puzzle pieces
-            for (let i = 0; i < 4*4; i++) {
-              const piece = document.createElement("div");
-              piece.className = "puzzle-piece";
-              piece.style.backgroundImage = `url(${canvasData})`;
-              piece.style.backgroundPosition = `-${(i % 4) * 150}px -${
-                Math.floor(i / 4) * 75
-              }px`;
-              piece.draggable = true;
-              piece.dataset.pieceNumber = i;
+            const canvas = document.createElement("canvas");
+            canvas.className = "puzzle-canvas";
+            canvas.width = 150;
+            canvas.height = 75;
+            const context = canvas.getContext("2d");
+            const img = new Image();
+            img.src = canvasData;
+            img.onload = function () {
+              context.drawImage(img, x, y, 150, 75, 0, 0, 150, 75);
+            };
 
-              // Add a drag and drop event listeners
-              piece.addEventListener("dragstart", function (event) {
-                event.dataTransfer.setData("text/plain", i);
-              });
+            canvas.draggable = true;
+            canvas.dataset.pieceNumber = i;
 
-              document.getElementById("puzzle").appendChild(piece);
-            }
+            canvas.addEventListener("dragstart", (event) => {
+              event.dataTransfer.setData("text/plain", i);
+              event.target.style.border = "2px dashed red";
+            });
 
-            // Create 16 canvas cells for dropping puzzle pieces
-            for (let i = 0; i < 16; i++) {
-              const cell = document.createElement("div");
-              cell.className = "canvas-cell";
-              cell.style.left = (i % 4) * 150 + "px";
-              cell.style.top = Math.floor(i / 4) * 75 + "px";
-              cell.dataset.cellNumber = i;
+            canvas.addEventListener("dragend", (event) => {
+              event.target.style.border = "none";
+            });
 
-              // Add a drop event listener
-              cell.addEventListener("dragover", function (event) {
-                event.preventDefault();
-              });
+            puzzlePieces.push(canvas);
+          }
 
-              cell.addEventListener("drop", function (event) {
-                event.preventDefault();
-                const pieceNumber = event.dataTransfer.getData("text/plain");
-                const piece = document.querySelector(
-                  `[data-piece-number="${pieceNumber}"]`
-                );
+          puzzlePieces.sort((a, b) => Math.random() - 0.5);
+          puzzlePieces.forEach((piece) => {
+            puzzleContainer.appendChild(piece);
+          });
+
+          const cells = [];
+          for (let i = 0; i < 16; i++) {
+            const cell = document.createElement("div");
+            cell.className = "canvas-cell";
+            cell.style.left = (i % 4) * 150 + "px";
+            cell.style.top = Math.floor(i / 4) * 75 + "px";
+            cell.dataset.canvasNumber = i;
+            cells.push(cell);
+          }
+
+          cells.forEach((cell) => {
+            cell.addEventListener("dragover", (event) => {
+              event.preventDefault();
+            });
+
+            cell.addEventListener("drop", (event) => {
+              const pieceNumber = event.dataTransfer.getData("text/plain");
+              const piece = document.querySelector(
+                `[data-piece-number="${pieceNumber}"]`
+              );
+              if (cell.children.length === 0) {
                 piece.style.position = "absolute";
                 piece.style.left = "0";
                 piece.style.top = "0";
+                piece.style.padding = "0";
                 cell.appendChild(piece);
-              });
+                checkPuzzleCompletion();
+              }
+            });
 
-              document.getElementById("rasterMap").appendChild(cell);
-            }
+            rasterMap.appendChild(cell);
           });
         });
+      });
 
       document
         .getElementById("getLocation")
-        .addEventListener("click", function (event) {
+        .addEventListener("click", (event) => {
           if (!navigator.geolocation) {
             console.log("No geolocation.");
           }
@@ -132,8 +176,8 @@
           navigator.geolocation.getCurrentPosition(
             (position) => {
               console.log(position);
-              let lat = position.coords.latitude;
-              let lon = position.coords.longitude;
+              let lat = position.coords.latitude.toFixed(2);
+              let lon = position.coords.longitude.toFixed(2);
 
               map.setView([lat, lon]);
             },
@@ -143,12 +187,38 @@
           );
         });
 
-      const puzzlePieces = document.querySelectorAll(".puzzle-piece");
-      puzzlePieces.forEach((piece) => {
-        piece.addEventListener("dragstart", function (event) {
-          event.dataTransfer.setData("text/plain", piece.dataset.pieceNumber);
-        });
-      });
+      function checkPuzzleCompletion() {
+        if (document.getElementById("puzzle").children.length == 0) {
+          const cells = document.querySelectorAll(".canvas-cell");
+          let isCompleted = true;
+
+          cells.forEach((cell, index) => {
+            const pieceNumber = cell.firstElementChild.dataset.pieceNumber;
+            if (pieceNumber != index) {
+              isCompleted = false;
+              return;
+            }
+          });
+
+          if (isCompleted) {
+            console.log("Puzzle ułożone.");
+            const puzzlePieces = document.querySelectorAll(".puzzle-canvas");
+            puzzlePieces.forEach((piece) => {
+              piece.draggable = false;
+              piece.classList.add("complete");
+            });
+
+            cells.forEach((cell) => {
+              cell.classList.add("complete");
+            });
+
+            const overlay = document.createElement("div");
+            overlay.className = "overlay";
+            overlay.innerText = "Puzzle ułożone. Gratulacje";
+            document.getElementById("rasterMap").appendChild(overlay);
+          }
+        }
+      }
     </script>
   </body>
 </html>
