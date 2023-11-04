@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
   <head>
     <meta charset="UTF-8" />
-    <title>Map Jigsaw Puzzle</title>
+    <title>Puzzle</title>
 
     <script src="leaflet-1.7.1/leaflet-src.js"></script>
     <script src="leaflet-1.7.1/leaflet-providers.js"></script>
@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="leaflet-1.7.1/leaflet.css" />
 
     <style>
-      #map-container {
+      #container {
         display: flex;
       }
 
@@ -29,51 +29,54 @@
         position: relative;
       }
 
-      .canvas-cell {
+      .puzzle-cell {
         width: 150px;
         height: 75px;
         position: absolute;
         border: 1px solid black;
-        overflow: hidden;
       }
       .puzzle-canvas {
-        width: 150px;
         height: 75px;
-        /* border: 1px solid black; */
         padding: 1px;
+        width: 150px;
         cursor: grab;
       }
 
       .puzzle-canvas:hover {
-        border: 2px dashed red; /* Możesz dostosować styl obramowania według własnych preferencji */
+        border: 2px dashed red;
       }
 
       .puzzle-canvas.complete {
-        opacity: 0.7; /* Ustawiamy poziom przezroczystości dla ułożonych puzzli */
-        pointer-events: none; /* Wyłączamy obsługę zdarzeń dla ułożonych puzzli */
+        opacity: 0.7;
       }
-      .canvas-cell.complete {
+      .puzzle-cell.complete {
         border: none;
       }
 
       .overlay {
         position: absolute;
-        top: 0px; /* Dostosuj tę wartość, aby ustawić odstęp od góry */
-        width: 100%;
+        top: 0px;
+        left: 0px;
         height: 100%;
-        text-align: center;
-        left: 0px; /* Dostosuj tę wartość, aby ustawić odstęp od lewej strony */
-        background-color: rgba(
-          114,
-          112,
-          112,
-          0.185
-        ); /* Kolor tła z przezroczystością */
+        width: 100%;
+
+        background-color: rgba(97, 95, 95, 0.185);
+
+        display: flex;
+        align-items: center;
+      }
+
+      .overlay p {
+        transform: rotate(30deg);
+        text-transform: uppercase;
+        size: 35px;
+        margin: 0 auto;
+        font-weight: bolder;
       }
     </style>
   </head>
   <body>
-    <div id="map-container">
+    <div id="container">
       <div id="map"></div>
       <div id="rasterMap"></div>
     </div>
@@ -97,22 +100,22 @@
           canvasData = canvas.toDataURL();
           let puzzlePieces = [];
           for (let i = 0; i < 16; i++) {
-            const x = (i % 4) * 150;
-            const y = Math.floor(i / 4) * 75;
+            const x_pos = (i % 4) * 150;
+            const y_pos = Math.floor(i / 4) * 75;
 
             const canvas = document.createElement("canvas");
             canvas.className = "puzzle-canvas";
+            const context = canvas.getContext("2d");
             canvas.width = 150;
             canvas.height = 75;
-            const context = canvas.getContext("2d");
+            canvas.dataset.puzzleNumber = i;
+            canvas.draggable = true;
+
             const img = new Image();
             img.src = canvasData;
             img.onload = function () {
-              context.drawImage(img, x, y, 150, 75, 0, 0, 150, 75);
+              context.drawImage(img, x_pos, y_pos, 150, 75, 0, 0, 150, 75);
             };
-
-            canvas.draggable = true;
-            canvas.dataset.pieceNumber = i;
 
             canvas.addEventListener("dragstart", (event) => {
               event.dataTransfer.setData("text/plain", i);
@@ -131,33 +134,52 @@
             puzzleContainer.appendChild(piece);
           });
 
-          const cells = [];
+          const puzzle_cells = [];
           for (let i = 0; i < 16; i++) {
             const cell = document.createElement("div");
-            cell.className = "canvas-cell";
+            cell.className = "puzzle-cell";
             cell.style.left = (i % 4) * 150 + "px";
             cell.style.top = Math.floor(i / 4) * 75 + "px";
             cell.dataset.canvasNumber = i;
-            cells.push(cell);
+            puzzle_cells.push(cell);
           }
 
-          cells.forEach((cell) => {
+          puzzle_cells.forEach((cell) => {
             cell.addEventListener("dragover", (event) => {
               event.preventDefault();
             });
 
             cell.addEventListener("drop", (event) => {
-              const pieceNumber = event.dataTransfer.getData("text/plain");
-              const piece = document.querySelector(
-                `[data-piece-number="${pieceNumber}"]`
+              const puzzleNumber = event.dataTransfer.getData("text/plain");
+              const targetPuzzleNumber = event.target.dataset.puzzleNumber;
+              const puzzle = document.querySelector(
+                `[data-puzzle-number="${puzzleNumber}"]`
               );
               if (cell.children.length === 0) {
-                piece.style.position = "absolute";
-                piece.style.left = "0";
-                piece.style.top = "0";
-                piece.style.padding = "0";
-                cell.appendChild(piece);
+                puzzle.style.position = "absolute";
+                puzzle.style.left = "0";
+                puzzle.style.top = "0";
+                puzzle.style.padding = "0";
+                cell.appendChild(puzzle);
                 checkPuzzleCompletion();
+              } else if (targetPuzzleNumber) {
+                const sourcePuzzle = document.querySelector(
+                  `[data-puzzle-number="${puzzleNumber}"]`
+                );
+                if (
+                  sourcePuzzle.parentElement.classList.contains("puzzle-cell")
+                ) {
+                  const targetPuzzle = document.querySelector(
+                    `[data-puzzle-number="${targetPuzzleNumber}"]`
+                  );
+
+                  const sourceParent = sourcePuzzle.parentElement;
+                  const targetParent = targetPuzzle.parentElement;
+
+                  sourceParent.appendChild(targetPuzzle);
+                  targetParent.appendChild(sourcePuzzle);
+                  checkPuzzleCompletion();
+                }
               }
             });
 
@@ -189,12 +211,12 @@
 
       function checkPuzzleCompletion() {
         if (document.getElementById("puzzle").children.length == 0) {
-          const cells = document.querySelectorAll(".canvas-cell");
+          const puzzle_cells = document.querySelectorAll(".puzzle-cell");
           let isCompleted = true;
 
-          cells.forEach((cell, index) => {
-            const pieceNumber = cell.firstElementChild.dataset.pieceNumber;
-            if (pieceNumber != index) {
+          puzzle_cells.forEach((cell, index) => {
+            const puzzleNumber = cell.firstElementChild.dataset.puzzleNumber;
+            if (puzzleNumber != index) {
               isCompleted = false;
               return;
             }
@@ -208,13 +230,13 @@
               piece.classList.add("complete");
             });
 
-            cells.forEach((cell) => {
+            puzzle_cells.forEach((cell) => {
               cell.classList.add("complete");
             });
 
             const overlay = document.createElement("div");
             overlay.className = "overlay";
-            overlay.innerText = "Puzzle ułożone. Gratulacje";
+            overlay.innerHTML = "<p>Puzzle ułożone. Gratulacje</p>";
             document.getElementById("rasterMap").appendChild(overlay);
           }
         }
