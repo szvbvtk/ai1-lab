@@ -15,6 +15,10 @@
         display: flex;
       }
 
+      body {
+        background-color: bisque;
+      }
+
       #map {
         width: 600px;
         height: 300px;
@@ -81,12 +85,18 @@
       <div id="rasterMap"></div>
     </div>
     <br />
-    <button id="getLocation">Get Current Location</button>
-    <button id="saveButton">Save Raster Map</button>
+    <button id="getLocation">Moja lokalizacja</button>
+    <button id="saveButton">Pobierz mapę</button>
     <br />
     <div id="puzzle"></div>
 
     <script>
+      window.onload = () => {
+        if ("Notification" in window) {
+          Notification.requestPermission();
+        }
+      };
+
       let map = L.map("map").setView([50, 12], 18);
       L.tileLayer.provider("Esri.WorldImagery").addTo(map);
 
@@ -238,6 +248,12 @@
             overlay.className = "overlay";
             overlay.innerHTML = "<p>Puzzle ułożone. Gratulacje</p>";
             document.getElementById("rasterMap").appendChild(overlay);
+
+            if (Notification.permission === "granted") {
+              const notification = new Notification("Puzzle ułożone.", {
+                body: "Gratulacje!",
+              });
+            }
           }
         }
       }
