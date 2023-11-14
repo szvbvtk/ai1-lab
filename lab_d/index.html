@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Document</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Raleway:wght@500&display=swap");
+
+      .container {
+        display: grid;
+        place-items: center;
+      }
+
+      h1 {
+        text-transform: uppercase;
+        font-family: "Raleway", sans-serif;
+        letter-spacing: 0.2rem;
+      }
+
+      .queryInput {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 1rem;
+        border: 1px solid #000;
+        width: 30%;
+      }
+
+      #weather-data-container {
+        margin-top: 1rem;
+        display: grid;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border: 1px solid #000;
+        width: 30%;
+      }
+
+      .single-weather-data{
+        border-top: 1px solid black;
+        width: 100%;
+        margin: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>rest weather</h1>
+      <div class="queryInput">
+        <input
+          type="text"
+          name="location"
+          id="location"
+          value="Szczecin, Poland"
+        />
+        <button id="submit">Pogoda</button>
+      </div>
+      <div id="weather-data-container">
+        <div class="single-weather-data">
+          <div class="icon">
+            <img
+              src="https://www.openweathermap.org/img/w/01d.png"
+              alt="weatherImg"
+            />
+          </div>
+
+          <div class="weather-info">
+            <div class="weather-date">2020-02-02</div>
+            <div class="weather-temperature">
+              <p>20<span>°C</span></p>
+            </div>
+            <div class="weather-feels-like">20.5</div>
+            <div class="weather-description">
+              <p>Cloudy</p>
+            </div>
+          </div>
+        </div>
+        <div class="single-weather-data">
+          <div class="icon">
+            <img
+              src="https://www.openweathermap.org/img/w/01d.png"
+              alt="weatherImg"
+            />
+          </div>
+
+          <div class="weather-info">
+            <div class="weather-date">2020-02-02</div>
+            <div class="weather-temperature">
+              <p>20<span>°C</span></p>
+            </div>
+            <div class="weather-feels-like">20.5</div>
+            <div class="weather-description">
+              <p>Cloudy</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="script.js"></script>
+</html>
