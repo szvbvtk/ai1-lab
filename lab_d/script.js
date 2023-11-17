@@ -4,10 +4,12 @@ class WeatherApp {
     this.weatherDataContainer = weatherDataContainer;
     this.submitButton = submitButton;
 
-    this.submitButton.addEventListener("click", () => { 
-        const city = queryInput.value;
-        this.clearWeatherDataContainer();
-        this.getWeather(city);
+    this.submitButton.addEventListener("click", async () => {
+      const city = queryInput.value;
+      this.clearWeatherDataContainer();
+      const { lat, lon } = await this.getCoordinates(city);
+      this.getCurrentWeather(lat, lon);
+      this.getWeather(lat, lon);
     });
   }
 
@@ -15,53 +17,94 @@ class WeatherApp {
     this.weatherDataContainer.innerText = "";
   }
 
-  async getWeather(city) {
-    // dodac obsluge !fetch.ok
-    const responseCoordinates = await fetch(
+  async getCoordinates(city) {
+    const response = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${this.apiKey}`
     );
-    const dataCoordinates = await responseCoordinates.json();
-    const lat = dataCoordinates.coord.lat;
-    const lon = dataCoordinates.coord.lon;
-    // console.log(lat, lon);
+    const data = await response.json();
+    const lat = data.coord.lat;
+    const lon = data.coord.lon;
+    console.log(city, ": ", lat, lon);
+    return { lat, lon };
+  }
 
+  createWeatherDataCard(weatherData, api = "forecast") {
+    let date;
+    if (api === "forecast") {
+      date = weatherData.dt_txt;
+    } else if (api === "current") {
+      date = new Date(weatherData.dt * 1000);
+
+      date = date.toLocaleDateString("pl-PL", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      }).replace(',', '').replace('.', '-');
+    }
+    const icon = weatherData.weather[0].icon;
+    const temperature = weatherData.main.temp;
+    const feelsLike = weatherData.main.feels_like;
+    const description = weatherData.weather[0].description;
+
+    const singleWeatherdata = document.createElement("div");
+    singleWeatherdata.classList.add("single-weather-data");
+    singleWeatherdata.innerHTML = `      
+      <div class="icon">
+      <img
+      src="https://www.openweathermap.org/img/w/${icon}.png"
+      alt="weatherImg"
+      >
+      </div>
+      <div class="weather-info">
+      <div class="weather-date"><p>${date}</p></div>
+      <div class="weather-temperature">
+      <p>${temperature}<span>°C</span></p>
+      </div>
+      <div class="weather-feels-like"><p>${feelsLike}<span>°C</span></p></div>
+      <div class="weather-description">
+      <p>${description}</p>
+      </div>
+      </div>
+    `;
+
+    return singleWeatherdata;
+  }
+
+  async getWeather(lat, lon) {
     const responseWeather = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=metric`
     );
     const dataWeather = await responseWeather.json();
 
-    console.log(dataWeather);
+    console.log("5 day forecast: ", dataWeather);
 
-    for (const weatherInfo of dataWeather.list) {
-      let singleWeatherdata = document.createElement("div");
-      singleWeatherdata.classList.add("single-weather-data");
-      singleWeatherdata.innerHTML = `        
-        <div class="single-weather-data">
-            <div class="icon">
-                <img
-                src="https://www.openweathermap.org/img/w/${weatherInfo.weather[0].icon}.png"
-                alt="weatherImg"
-                >
-            </div>
-            <div class="weather-info">
-                <div class="weather-date"><p>${weatherInfo.dt_txt}</p></div>
-                    <div class="weather-temperature">
-                      <p>${weatherInfo.main.temp}<span>°C</span></p>
-                    </div>
-                <div class="weather-feels-like"><p>${weatherInfo.main.feels_like}<span>°C</span></p></div>
-                    <div class="weather-description">
-                        <p>${weatherInfo.weather[0].description}</p>
-                    </div>
-                </div>
-            </div>
-        </div>`;
+    for (const weatherData of dataWeather.list) {
+      const singleWeatherCard = this.createWeatherDataCard(weatherData, "forecast");
 
-      this.weatherDataContainer.appendChild(singleWeatherdata);
+      this.weatherDataContainer.appendChild(singleWeatherCard);
     }
   }
 
-  getCurrentweather() {
-    return
+  async getCurrentWeather(lat, lon) {
+    const xhr = new XMLHttpRequest();
+    xhr.open(
+      "GET",
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=metric`,
+      true
+    );
+    xhr.addEventListener("load", () => {
+      const currentWeatherData = JSON.parse(xhr.responseText);
+      console.log("current weather: ", currentWeatherData);
+
+      const currentWeatherCard = this.createWeatherDataCard(currentWeatherData, "current");
+      this.weatherDataContainer.appendChild(currentWeatherCard);
+    });
+
+    xhr.send(null);
   }
 }
 
