@@ -1,17 +1,22 @@
 class WeatherApp {
-  constructor(apiKey, weatherDataContainer, queryInput, submitButton) {
+  constructor(apiKey, weatherDataContainer, searchBar, submitButton) {
     this.apiKey = apiKey;
     this.weatherDataContainer = weatherDataContainer;
     this.submitButton = submitButton;
 
     this.submitButton.addEventListener("click", async () => {
-      const city = queryInput.value;
+      const city = searchBar.value;
       this.clearWeatherDataContainer();
 
-      const { lat, lon } = await this.getCoordinates(city);
-      if (lat !== undefined && lon !== undefined) {
+      const { lat, lon, msg } = await this.getCoordinates(city);
+      if (msg === null) {
         this.getCurrentWeather(lat, lon);
-        this.getWeather(lat, lon);
+        await this.getWeatherForecast(lat, lon);
+      } else {
+        const errorMessage = document.createElement("p");
+        errorMessage.id = "info-message";
+        errorMessage.innerText = msg;
+        this.weatherDataContainer.appendChild(errorMessage);
       }
     });
   }
@@ -23,67 +28,65 @@ class WeatherApp {
   async getCoordinates(city) {
     let lat;
     let lon;
+    let errorMessage = null;
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${this.apiKey}`
+        `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${this.apiKey}`
       );
 
-      if (response.status === 404) {
-        throw new Error("City not found");
-      }
       if (!response.ok) {
-        throw new Error();
+        throw new Error("Connection error");
       }
 
       const data = await response.json();
-      lat = data.coord.lat;
-      lon = data.coord.lon;
+
+      if (data.length === 0) {
+        throw new Error("City not found, try again");
+      }
+
+      lat = data[0].lat;
+      lon = data[0].lon;
       console.log(city, ": ", lat, lon);
-      return { lat, lon };
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
+      errorMessage = error.message;
       lat = undefined;
       lon = undefined;
-      alert("City not found");
     }
-    return { lat, lon };
+    return { lat, lon, msg: errorMessage };
   }
 
-  createWeatherDataCard(weatherData, api = "forecast") {
-    let date;
-    if (api === "forecast") {
-      date = weatherData.dt_txt;
-    } else if (api === "current") {
-      date = new Date(weatherData.dt * 1000);
+  createWeatherEntry(weatherData) {
+    let date = new Date(weatherData.dt * 1000);
 
-      date = date
-        .toLocaleDateString("pl-PL", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-        })
-        .replace(",", "")
-        .replaceAll(".", "-");
-    }
+    date = date
+      .toLocaleDateString("pl-PL", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+      .replace(",", "")
+      .replaceAll(".", "-");
+
     const icon = weatherData.weather[0].icon;
     const temperature = weatherData.main.temp;
     const feelsLike = weatherData.main.feels_like;
     const description = weatherData.weather[0].description;
 
-    const singleWeatherdata = document.createElement("div");
-    singleWeatherdata.classList.add("single-weather-data");
-    singleWeatherdata.innerHTML = `      
-      <div class="icon">
+    const weatherEntry = document.createElement("div");
+    weatherEntry.classList.add("weather-entry");
+    weatherEntry.innerHTML = `      
+      <div class="weather-icon">
       <img
       src="https://www.openweathermap.org/img/w/${icon}.png"
       alt="weatherImg"
       >
       </div>
-      <div class="weather-info">
+      <div class="weather-details">
       <div class="weather-date"><p>${date}</p></div>
       <div class="weather-temperature">
       <p>Temperature: ${temperature}<span>°C</span></p>
@@ -95,36 +98,33 @@ class WeatherApp {
       </div>
     `;
 
-    return singleWeatherdata;
+    return weatherEntry;
   }
 
-  async getWeather(lat, lon) {
+  async getWeatherForecast(lat, lon) {
     try {
       const responseWeather = await fetch(
         `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=metric`
       );
 
       if (!responseWeather.ok) {
-        throw new Error();
+        throw new Error("Connection error");
       }
-      const dataWeather = await responseWeather.json();
+      const data = await responseWeather.json();
 
-      console.log("5 day forecast: ", dataWeather);
+      console.log("5 day forecast: ", data);
 
-      for (const weatherData of dataWeather.list) {
-        const singleWeatherCard = this.createWeatherDataCard(
-          weatherData,
-          "forecast"
-        );
+      for (const weatherData of data.list) {
+        const weatherEntry = this.createWeatherEntry(weatherData);
 
-        this.weatherDataContainer.appendChild(singleWeatherCard);
+        this.weatherDataContainer.appendChild(weatherEntry);
       }
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
   }
 
-  async getCurrentWeather(lat, lon) {
+  getCurrentWeather(lat, lon) {
     try {
       const xhr = new XMLHttpRequest();
       xhr.open(
@@ -134,31 +134,28 @@ class WeatherApp {
       );
       xhr.addEventListener("load", () => {
         if (xhr.status !== 200) {
-          throw new Error();
+          throw new Error("Connection error");
         }
-        const currentWeatherData = JSON.parse(xhr.responseText);
-        console.log("current weather: ", currentWeatherData);
+        const data = JSON.parse(xhr.responseText);
+        console.log("current weather: ", data);
 
-        const currentWeatherCard = this.createWeatherDataCard(
-          currentWeatherData,
-          "current"
-        );
-        this.weatherDataContainer.appendChild(currentWeatherCard);
+        const currentWeatherEntry = this.createWeatherEntry(data);
+        currentWeatherEntry.id = "current-weather-entry";
+        this.weatherDataContainer.appendChild(currentWeatherEntry);
       });
 
       xhr.send(null);
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
   }
 }
 
-const app = new WeatherApp(
-  "7ded80d91f2b280ec979100cc8bbba94",
-  document.getElementById("weather-data-container"),
-  document.getElementById("location"),
-  document.getElementById("submit")
-);
-// document.getElementById("submit").addEventListener("click", () => {
-//   app.getWeather("Szczecin, Poland");
-// });
+window.addEventListener("load", () => {
+  const app = new WeatherApp(
+    "7ded80d91f2b280ec979100cc8bbba94",
+    document.getElementById("weather-results"),
+    document.getElementById("location"),
+    document.getElementById("submit")
+  );
+});
