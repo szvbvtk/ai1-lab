@@ -30,7 +30,7 @@ function createLinkItem(
   const linkItem: HTMLAnchorElement = document.createElement("a");
   linkItem.textContent = fileName;
   linkItem.href = "#";
-  linkItem.onclick = () => setCss(fileName, _directoryName);
+  linkItem.onclick = ():void => setCss(fileName, _directoryName);
 
   return linkItem;
 }
@@ -38,7 +38,7 @@ function createLinkItem(
 function createLinkList(
   _fileNames: string[] = fileNames,
   _directoryName: string = directoryName
-) {
+): HTMLUListElement {
   const linkList: HTMLUListElement = document.createElement("ul");
   linkList.className = "species_list";
 
@@ -55,6 +55,8 @@ function createLinkList(
 
   return linkList;
 }
+
+// setCss();
 
 const linkList: HTMLUListElement = createLinkList();
 const cssSwitcher = document.querySelector("#css-switcher");

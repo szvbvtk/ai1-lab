@@ -45,6 +45,7 @@ function createLinkList() {
   });
   return linkList;
 }
+// setCss();
 var linkList = createLinkList();
 var cssSwitcher = document.querySelector("#css-switcher");
 if (cssSwitcher) {
