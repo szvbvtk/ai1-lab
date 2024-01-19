@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="io.cordova.hellocordova" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>WeatherApp</name>
+    <description>an application for displaying weather information in a specific city</description>
+    <author email="sk51114@zut.edu.pl" href="">
+        Krystian Szabat
+    </author>
+    <platform name="electron">
+    <icon src="res/electron/sun.png" />
+    <preference name="ElectronSettingsFilePath" value="res/electron/settings.json" />
+    </platform>
+
+
+    <content src="weather.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <access origin="http://api.openweathermap.org" />
+    <access origin="http://api.openweathermap.org/data/2.5/weather" />
+    <access origin="http://api.openweathermap.org/data/2.5/forecast" />
+    <access origin="http://api.openweathermap.org/data/2.5/forecast/daily" />
+</widget>
